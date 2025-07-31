@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>授权管理服务</title>
+    <link rel="stylesheet" href="./bootstrapt5/bootstrap.css"/>
+    <link rel="stylesheet" href="./index.css">
+    <script src="./jquery/jquery-3.7.1.min.js"></script>
+    <script src="./handlebarsJS/handlebars.min.js"></script>
+</head>
+<body>
+<div class="view">
+    <div class="header">
+        <div style="flex: 1">
+            <h1>授权管理服务</h1>
+            <p class="text-secondary">
+                对本地授权代理提供的唯一标识码提供授权码，并且存储和管理不同服务的授权信息已经授权信息更新。</p>
+        </div>
+        <div>
+            <h3><span id="authRecordCount" class="badge  bg-info"></span></h3>
+        </div>
+    </div>
+    <div style="height: 1px;background: #cbcbcb;margin: 0 20px "></div>
+    <div class="auth-list-header">
+        <div style="display: flex;gap: 5px;align-items: center">
+            <div><input type="text" id="searchInput" class="form-control" placeholder="输入授权名称搜索"/></div>
+            <div>
+                <button type="button" onclick="searchConfirm()" class="btn btn-primary">搜索</button>
+            </div>
+            <div>
+                <button type="button" onclick="clearSearch()" class="btn btn-secondary">清空搜索</button>
+            </div>
+        </div>
+       <div>
+           <button type="button" onclick="generateKeys()" class="btn btn-primary">
+               生成新的相关密钥
+           </button>
+           <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addAuthDialog">
+               新增授权记录
+           </button>
+       </div>
+
+    </div>
+    <div class="auth-list-box">
+        <div id="authList" class="auth-list-box-content">
+        </div>
+        <div id="empty-view"
+             style="align-items: center;display: flex;flex-direction: column;height: 100%;justify-content: center">
+            <img src="./img/empty.png" style="width: 250px;height: 300px" alt="">
+            <span class="h4" style="margin-top: 15px">暂无授权信息，请新增授权记录</span>
+        </div>
+    </div>
+</div>
+<div id="loadingView" class="loading-view">
+    <div class="loading"></div>
+    <span id="loadingTip" class="loading-tip">加载中...</span>
+</div>
+<div class="modal fade" id="addAuthDialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">新增授权</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- 模态框内容 -->
+            <div class="modal-body">
+                <div style="display: flex;flex-direction: column;gap: 10px">
+                    <div class="input-group">
+                        <span class="input-group-text">授权名称</span>
+                        <input type="text" id="newRecordName" class="form-control"
+                               placeholder="授权名称"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">机器码</span>
+                        <input type="text" id="newRecordUniqueCode" class="form-control"
+                               placeholder="输入唯一机器码"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">授权到期日期</span>
+                        <input id="newRecordDate" class="date-select" type="date">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" onclick="addRecord()" class="btn btn-primary" data-bs-dismiss="modal">确认
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="updateAuthEndTimeDialog">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">更新授权到期时间</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- 模态框内容 -->
+            <div class="modal-body">
+                <div style="display: flex;flex-direction: column;gap: 10px">
+                    <div class="input-group">
+                        <span class="input-group-text">授权名称</span>
+                        <input disabled type="text" id="updateRecordName" class="form-control"
+                               placeholder="授权名称"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">机器码</span>
+                        <input disabled type="text" id="updateRecordUniqueCode"  class="form-control"
+                               placeholder="输入唯一机器码"/>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-text">授权到期日期</span>
+                        <input id="updateRecordDate" class="date-select" type="date">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" onclick="confirmUpdateRecord()" class="btn btn-primary" data-bs-dismiss="modal">确认
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="keysGeneratorDialog" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">生成新的密钥内容</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- 模态框内容 -->
+            <div class="modal-body">
+                <div style="display: flex;flex-direction: column;gap: 10px">
+                    <div class="mb-4 key-container">
+                        <label  class="form-label fw-bold">AES密钥Base64(32长度):</label>
+                        <div class="input-group">
+                            <textarea id="aesKey" class="form-control key-textarea" rows="3" readonly>这是生成的AES密钥，通常会很长，所以需要换行展示。示例密钥：gJkFpQ1sR7yX0bVcN8wM4zD2hL5oP6uI9eA3tYxCvB7nZqWtE0fGrUsIjKpHlOmNbYcVxZ</textarea>
+                            <span style="width: 10px"></span>
+                            <button class="btn btn-outline-primary" type="button" onclick="copyKeys('aesKey','AES密钥Base64')">复制</button>
+                        </div>
+                    </div>
+                    <div class="mb-4 key-container">
+                        <label  class="form-label fw-bold">RSA公钥Base64(2048长度):</label>
+                        <div class="input-group">
+                            <textarea id="rsaPublicKey" class="form-control key-textarea" rows="3" readonly>这是生成的AES密钥，通常会很长，所以需要换行展示。示例密钥：gJkFpQ1sR7yX0bVcN8wM4zD2hL5oP6uI9eA3tYxCvB7nZqWtE0fGrUsIjKpHlOmNbYcVxZ</textarea>
+                            <span style="width: 10px"></span>
+                            <button class="btn btn-outline-primary" type="button" onclick=" copyKeys('rsaPublicKey','RSA公钥Base64')">复制</button>
+                        </div>
+                    </div>
+                    <div class="mb-4 key-container">
+                        <label class="form-label fw-bold">RSA私钥Base64(2048长度):</label>
+                        <div class="input-group">
+                            <textarea id="rsaPrivateKey" class="form-control key-textarea" rows="3" readonly>这是生成的AES密钥，通常会很长，所以需要换行展示。示例密钥：gJkFpQ1sR7yX0bVcN8wM4zD2hL5oP6uI9eA3tYxCvB7nZqWtE0fGrUsIjKpHlOmNbYcVxZ</textarea>
+                            <span style="width: 10px"></span>
+                            <button class="btn btn-outline-primary" type="button" onclick=" copyKeys('rsaPrivateKey','RSA私钥Base64')">复制</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                <button type="button" class="btn btn-success" onclick="updateKeys()">刷新</button>
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script id="authListItem" type="text/x-handlebars-template">
+    {{#each this}}
+    <div class="card" style="margin-top: 15px">
+        <div class="card-header">
+            <div style="display: flex;justify-content: space-between; align-items: center;">
+                <span style="font-size: 18px">{{this.name}}</span>
+                <div>
+                        <span class="badge status-badge {{statusClass this.endTimestamp}}" style="font-size: 13px">
+                            {{statusText this.endTimestamp}}
+                            {{formatTimestamp this.endTimestamp}}
+                        </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div style="display: flex;align-items: center">
+                <div style="flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                    机器唯一编码: <span style="font-weight: bold;">{{this.uniqueCode}}</span>
+                </div>
+                <div style="display: flex;gap: 5px">
+                    <button type="button" class="btn btn-outline-info btn-sm" data-action="get"
+                            onclick="getAuthCode('{{this.id}}',this)">获取授权码
+                    </button>
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                            onclick="updateEndTimestamp('{{this.id}}')">更新授权截至日期
+                    </button>
+                    <button type="button" class="btn btn-outline-danger btn-sm" onclick="deleteRecord('{{this.id}}')">
+                        删除记录
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{/each}}
+</script>
+
+<script src="./bootstrapt5/bootstrap.bundle.js"></script>
+<script src="./index.js"></script>
+</body>
+</html>

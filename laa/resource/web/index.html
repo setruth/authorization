@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>本地鉴权代理</title>
+    <link rel="stylesheet" href="/static/bootstrapt5/bootstrap.css"/>
+    <link rel="stylesheet" href="/static/index.css">
+    <script src="/static/jquery/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<div class="view">
+    <div class="header">
+        <div class="title">
+            <h1>本地鉴权代理服务</h1>
+            <p class="text-secondary">
+                本服务用于部署在离线业务程序所在的机器上，负责生成设备唯一标识、安全存储授权文件，并执行所有本地的授权验证逻辑，供业务程序查询。</p>
+        </div>
+        <div class="authorization-tag">
+            <div style="display: flex">
+                <h3><span id="subscribeStatus" class="badge  bg-warning">等待授权状态变化订阅</span></h3>
+                <h3><span id="authorizationTag" class="badge" style="margin-left: 10px">已授权</span></h3>
+            </div>
+            <span id="nowTime" style="font-weight: bold" class="text-secondary">当前时间: 2023-01-01 00:00:00</span>
+            <span id="endTime" style="font-weight: bold" class="text-info-emphasis">到期时间: 2023-01-01 00:00:00</span>
+        </div>
+    </div>
+    <div class="card ">
+        <div class="card-header">
+            <h5>读取服务器唯一标识</h5>
+        </div>
+        <div class="card-body">
+            <div class="unique-identification-box">
+                <div style="flex: 1">
+                    <input disabled type="text" id="uniqueCodeText" class="form-control"
+                           placeholder="点击右边按钮获取"/>
+                </div>
+                <div>
+                    <button disabled id="copyUniqueCodeBtn" onclick="copyUniqueCode()" type="button"
+                            class="btn btn-secondary">
+                        复制
+                    </button>
+                    <button id="getUniqueCodeBtn" onclick="getUniqueCode()" type="button" class="btn btn-primary">
+                        <span id="getUniqueCodeBtnLoading" style="display: none"
+                              class="spinner-border spinner-border-sm"></span>
+                        获取唯一标识
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card ">
+        <div class="card-header">
+            <h5>服务授权</h5>
+        </div>
+        <div class="card-body">
+            <div class="authorization-box">
+                <div style="flex: 1">
+                    <input type="text" id="authorizationCode" class="form-control" placeholder="输入激活码"/>
+                </div>
+                <div>
+                    <button onclick="activateServer()" id="activateBtn" type="button" class="btn btn-primary">激活/更新授权</button>
+                    <button onclick="clearActivate()" id="deleteAuthorizationBtn" type="button" class="btn btn-danger">
+                        授权清空
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loadingView" class="loading-view">
+    <div class="loading"></div>
+    <span id="loadingTip" class="loading-tip">加载中...</span>
+</div>
+<script src="/static/index.js"></script>
+<script src="/static/bootstrapt5/bootstrap.bundle.js"></script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+@import "loading.css";
+
+html, body {
+    height: 100%;
+    width: 100%;
+}
+
+.view {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.header {
+    padding: 20px 20px 0;
+    display: flex;
+}
+
+.title {
+    flex: 1;
+}
+
+.auth-list-header {
+    padding: 20px 20px 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.auth-list-box {
+    padding: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.auth-list-box-content {
+    margin-top: 10px;
+}
+.temp-auth-code-box{
+    margin-top: 5px;
+    display: flex;
+    gap: 5px;
+}
+.count-down{
+    border-radius: 100%;
+    padding: 1px 8px;
+    height: fit-content;
+    border: 2px dashed green;
+    white-space: normal;
+}
+.temp-auth-code {
+    word-break: break-all;
+    white-space: normal;
+    font-weight: bold;
+    color: green;
+    border-radius: 3px;
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    text-decoration: underline;
+}
+
+.date-select {
+    flex: 1;
+    outline: none;
+    border: 1px solid #dcdfe6;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+/* 1. 定义整个滚动条的宽度（垂直滚动条）或高度（水平滚动条） */
+::-webkit-scrollbar {
+    width: 12px; /* 垂直滚动条的宽度 */
+    height: 12px; /* 水平滚动条的高度 */
+}
+
+/* 2. 定义滚动条的轨道（背景） */
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* 轨道背景色 */
+    border-radius: 10px; /* 轨道圆角 */
+}
+
+/* 3. 定义滚动条的滑块（可以拖动的那个部分） */
+::-webkit-scrollbar-thumb {
+    background: #888; /* 滑块背景色 */
+    border-radius: 10px; /* 滑块圆角 */
+    border: 3px solid #f1f1f1; /* 滑块边框，让它看起来更窄并与轨道有间隔 */
+}
+
+/* 4. 当鼠标悬停在滑块上时 */
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* 滑块悬停时的背景色 */
+}
+
+/* 5. 滚动条在角落的区域（如果同时有垂直和水平滚动条） */
+::-webkit-scrollbar-corner {
+    background: #f1f1f1; /* 角落区域的背景色，通常与轨道色一致 */
+    border-radius: 10px; /* 角落圆角 */
+}
