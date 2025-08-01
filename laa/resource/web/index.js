@@ -2,6 +2,7 @@ const UNAUTHORIZED_STATUS = 0
 const AUTHORIZED_STATUS = 1
 const EXPIRE_STATUS = 2
 let authorizationEventSource = null;
+const canUseClipboard = navigator.clipboard && window.isSecureContext
 $(document).ready(function () {
     hideLoadingView()
     subscribeAuthorizationStatus()
@@ -59,6 +60,10 @@ function copyUniqueCode() {
     const uniqueCode = $("#uniqueCodeText").val()
     if (uniqueCode === "") {
         alert("无唯一标识")
+        return
+    }
+    if (!canUseClipboard){
+        alert("当前无法使用自动复制功能，可能是不在Https标准下，请手动复制")
         return
     }
     navigator.clipboard.writeText(uniqueCode).then(function () {

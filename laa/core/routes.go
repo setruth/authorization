@@ -3,22 +3,23 @@ package main
 import (
 	"authorization.setruth.com/laa/handler"
 	"authorization.setruth.com/laa/model"
+	"authorization.setruth.com/laa/resource"
 	"authorization.setruth.com/laa/task"
 	"authorization.setruth.com/laa/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
-func InitRoutes(context *gin.Engine) {
+func InitRoutes(router *gin.Engine) {
 	//WebGUI
-	context.LoadHTMLFiles("resource/web/index.html")
-	context.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.html", gin.H{})
+	router.StaticFS("/web", http.FS(resource.WebStatic))
+	router.GET("/", func(c *gin.Context) {
+		c.Redirect(http.StatusMovedPermanently, "/web/index.html")
 	})
-	context.Static("/static", "resource/web")
+	router.Static("/static", "resource/web")
 
 	//API
-	rootPath := context.Group("/api")
+	rootPath := router.Group("/api")
 	{
 		rootPath.GET("/uniqueCode", func(context *gin.Context) {
 			context.JSON(http.StatusOK, model.BaseRes[string]{
