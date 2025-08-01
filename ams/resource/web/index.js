@@ -3,6 +3,7 @@ const emptyView = $("#empty-view")
 let allList = []
 let newestTime = Date.now()
 let nowUpdateRecord = null
+const canUseClipboard = navigator.clipboard && window.isSecureContext
 $(document).ready(function () {
     hideLoadingView()
     updateList()
@@ -143,6 +144,12 @@ function getAuthCode(idStr, btnDom) {
         url: `/api/authList/authCode/${id}`,
         type: 'GET',
         success: function (res) {
+            if (!canUseClipboard){
+                alert("当前无法使用自动复制功能，可能是不在Https标准下，请手动复制,8秒后销毁")
+                const cardBodyDom = $(btnDom).closest('.card-body');
+                createTempAuthCode(res.data, cardBodyDom)
+                return
+            }
             navigator.clipboard.writeText(res.data).then(function () {
                 alert("自动复制成功")
             }, function () {
@@ -290,6 +297,10 @@ function updateKeys() {
 }
 
 function copyKeys(id, title) {
+    if (!canUseClipboard){
+        alert("当前无法使用自动复制功能，可能是不在Https标准下，请手动复制")
+        return
+    }
     navigator.clipboard.writeText($(`#${id}`).val()).then(function () {
             alert(`${title}自动复制成功`)
         }, function () {
