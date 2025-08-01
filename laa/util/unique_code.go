@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"net"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -14,24 +15,27 @@ func GetUniqueCode() (string, error) {
 	if runtime.GOOS != "windows" {
 		return "", fmt.Errorf("当前操作系统不是Windows，无法获取唯一机器码")
 	}
-
-	cpuID, err := getCpuIdentifier()
-	if err != nil {
-		return "", fmt.Errorf("获取CPU标识符失败: %w", err)
+	cpuID, _ := getCpuIdentifier()
+	motherboardSN, _ := getMotherboardSerialNumber()
+	addressMAC, _ := getFirstMacAddress()
+	var uniqueCode string
+	switch {
+	case cpuID != "" && motherboardSN != "":
+		uniqueCode = cpuID + "_" + motherboardSN
+	case cpuID != "" && addressMAC != "":
+		uniqueCode = cpuID + "_" + addressMAC
+	case motherboardSN != "" && addressMAC != "":
+		uniqueCode = motherboardSN + "_" + addressMAC
+	case cpuID != "":
+		uniqueCode = cpuID
+	case motherboardSN != "":
+		uniqueCode = motherboardSN
+	case addressMAC != "":
+		uniqueCode = addressMAC
 	}
-	if cpuID == "" {
-		return "", fmt.Errorf("未获取到CPU标识符")
+	if uniqueCode == "" {
+		return "", fmt.Errorf("未能获取到任何可用的唯一机器标识符")
 	}
-
-	motherboardSN, err := getMotherboardSerialNumber()
-	if err != nil {
-		return "", fmt.Errorf("获取主板序列号失败: %w", err)
-	}
-	if motherboardSN == "" {
-		return "", fmt.Errorf("未获取到主板序列号")
-	}
-
-	uniqueCode := cpuID + "_" + motherboardSN
 	hasher := sha256.New()
 	hasher.Write([]byte(uniqueCode))
 	hashInBytes := hasher.Sum(nil)
@@ -53,11 +57,10 @@ func getCpuIdentifier() (string, error) {
 			return trimmedLine, nil
 		}
 	}
-	return "", fmt.Errorf("未从wmic output中解析到ProcessorId")
+	return "", fmt.Errorf("拿不到CPU序列号")
 }
 
 func getMotherboardSerialNumber() (string, error) {
-	// 对应 Kotlin 中的 `wmic baseboard get serialnumber`
 	cmdStr := "wmic baseboard get serialnumber"
 	output, err := executeCommand(cmdStr)
 	if err != nil {
@@ -71,9 +74,25 @@ func getMotherboardSerialNumber() (string, error) {
 			return trimmedLine, nil
 		}
 	}
-	return "", fmt.Errorf("未从wmic output中解析到SerialNumber")
+	return "", fmt.Errorf("拿不到主板序列号")
 }
 
+func getFirstMacAddress() (string, error) {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return "", err
+	}
+	for _, iface := range interfaces {
+		if iface.Flags&net.FlagUp == 0 || iface.Flags&net.FlagLoopback != 0 {
+			continue
+		}
+		if len(iface.HardwareAddr) > 0 {
+			return iface.HardwareAddr.String(), nil
+		}
+	}
+
+	return "", fmt.Errorf("未找到有效的 MAC 地址")
+}
 func executeCommand(commandStr string) (string, error) {
 	var stdout bytes.Buffer
 	var stderr bytes.Buffer
