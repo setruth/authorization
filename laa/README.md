@@ -21,16 +21,24 @@
 - [ ] MacOS
 - [ ] Linux 
 
-## 使用项目
-使用`GoLand`IDE或手动Clone后请切换到laa分支
+## 使用模块
+使用`GoLand`IDE或手动Clone后请操作`laa`文件夹
 ### 1.配置密钥
-需要自定义密钥时请在`model/constant.go`中设置`aesKeyBASE64`和`rsaPublicKeyBASE64`密钥，并且设置`ams`中相关密钥，确保两个模块密钥一致。
+模块内置默认密钥，如果不需要自定义可以跳过此步骤，自定义的密钥请遵守下列的规范。相关密钥可自行生成或利用`ams`模块的WebGUI进行生成
+#### 配置AES密钥
 
-**如果不自定义将使用默认密钥。可以跳过配置密钥步骤。自定义的相关密钥可以通过自己生成或使用`ams`的`WebGUI`页面来生成或自己生成。**
-- `aesKeyBASE64`: 用于对授权信息加密。请填入密钥的`BASE64编码`，请遵循AES密钥规范。
+此密钥用于对授权密文解密。需自定义(无需可跳过)密钥时请在`model/constant.go`中设置`aesKeyBASE64`变量。
+
+**请遵循AES密钥规范，确保设置的是AES密钥的`BASE64`编码内容且和`ams`模块中的AES密钥相同**
+
 > 默认aesKeyBASE64: `lBbYXsW3hbBc6IyUOXAPelaWB7t+lsqLbzyaO1oM+uU=`
-- `rsaPublicKeyBASE64`: 用于对授权码中签名进行校验。请填入公钥的`BASE64编码`，请遵循RSA密钥规范设置公钥。
-> 默认rsaPublicKeyBASE64: 请查看`model/constant.go`文件中`rsaPublicKeyBASE64`，私钥请查看`ams`模块文档中说明
+
+#### 配置RSA公钥
+此密钥用于对授权码进行签名校验确保密文一致性。需自定义(无需可跳过)密钥时请在`model/constant.go`中设置`rsaPublicKeyBASE64`变量。
+
+**请遵循RSA密钥规范，确保设置的是RSA公钥的`BASE64`编码内容且和`ams`模块中的RSA私钥为一对**
+
+> 默认rsaPublicKeyBASE64: 请查看`model/constant.go`文件中`rsaPublicKeyBASE64`
 ### 2.构建执行程序
 使用`GoLand`IDE或在项目根目录执行指令构建程序
 ```shell
