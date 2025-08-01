@@ -5,7 +5,7 @@ let newestTime = Date.now()
 let nowUpdateRecord = null
 $(document).ready(function () {
     hideLoadingView()
-    // updateList()
+    updateList()
 })
 Handlebars.registerHelper('statusClass', function (endTimestamp) {
     return endTimestamp >= newestTime ? 'bg-success' : 'bg-danger';
