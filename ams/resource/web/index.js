@@ -49,7 +49,7 @@ function renderAuthorizationList() {
 
 function updateList() {
     $.ajax({
-        url: 'http://localhost:1023/api/authList/all',
+        url: '/api/authList/all',
         type: 'GET',
         success: function (res) {
             allList = res.data
@@ -86,7 +86,7 @@ function addRecord() {
     const dateObject = new Date(dateString);
     timestamp = dateObject.getTime();
     $.ajax({
-        url: 'http://localhost:1023/api/authList/add',
+        url: '/api/authList/add',
         type: 'POST',
         data: JSON.stringify({
             name: name,
@@ -120,7 +120,7 @@ function deleteRecord(idStr) {
     const confirmResult = confirm(`确定要删除[${nowRecord.name}]吗？`)
     if (!confirmResult) return
     $.ajax({
-        url: `http://localhost:1023/api/authList/${id}`,
+        url: `/api/authList/${id}`,
         type: 'DELETE',
         success: function (res) {
             alert("删除成功");
@@ -140,7 +140,7 @@ function getAuthCode(idStr, btnDom) {
     showLoadingView("正在生成授权码")
     const id = parseInt(idStr)
     $.ajax({
-        url: `http://localhost:1023/api/authList/authCode/${id}`,
+        url: `/api/authList/authCode/${id}`,
         type: 'GET',
         success: function (res) {
             navigator.clipboard.writeText(res.data).then(function () {
@@ -201,7 +201,7 @@ function confirmUpdateRecord() {
         return;
     }
     $.ajax({
-        url: 'http://localhost:1023/api/authList/updateEndTimestamp',
+        url: '/api/authList/updateEndTimestamp',
         type: 'POST',
         data: JSON.stringify({
             id: nowUpdateRecord.id,
