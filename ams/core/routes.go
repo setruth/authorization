@@ -3,11 +3,11 @@ package main
 import (
 	"authorization.setruth.com/ams/entity"
 	"authorization.setruth.com/ams/model"
+	"authorization.setruth.com/ams/resource"
 	"authorization.setruth.com/ams/util"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"embed"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -18,17 +18,15 @@ import (
 	"strconv"
 )
 
-var webContent embed.FS
-
-func InitRoutes(context *gin.Engine, db *gorm.DB) {
+func InitRoutes(router *gin.Engine, db *gorm.DB) {
 	//WebGUI
-	context.Static("/web", "resource/web")
-	context.GET("/", func(c *gin.Context) {
+	router.StaticFS("/web", http.FS(resource.WebStatic))
+	router.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusMovedPermanently, "/web/index.html")
 	})
 
 	//API
-	rootPath := context.Group("/api")
+	rootPath := router.Group("/api")
 	{
 		authListPath := rootPath.Group("/authList")
 		{
@@ -155,18 +153,6 @@ func InitRoutes(context *gin.Engine, db *gorm.DB) {
 			})
 		}
 		rootPath.GET("generateKeys", func(context *gin.Context) {
-
-			context.Header("Access-Control-Allow-Origin", "*")
-			// 允许所有常用 HTTP 方法
-			context.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")
-			// 允许所有常用请求头
-			context.Header("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, User-Agent, Authorization, X-Requested-With")
-			// 允许浏览器访问的响应头（如果你的后端有自定义响应头，前端需要读取）
-			context.Header("Access-Control-Expose-Headers", "Content-Length")
-			// 是否允许发送 Cookie 或 HTTP 认证信息
-			context.Header("Access-Control-Allow-Credentials", "true")
-			// 预检请求（OPTIONS）的缓存时间，这里设置为 1 天 (86400 秒)
-			context.Header("Access-Control-Max-Age", "86400")
 			aesKey := make([]byte, 32)
 			_, err := rand.Read(aesKey)
 			if err != nil {
