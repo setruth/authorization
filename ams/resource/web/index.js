@@ -271,7 +271,7 @@ function generateKeys() {
 
 function updateKeys() {
     $.ajax({
-        url: 'http://localhost:1023/api/generateKeys',
+        url: '/api/generateKeys',
         type: 'Get',
         success: function (res) {
             const {data} = res
