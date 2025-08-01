@@ -18,7 +18,7 @@ func main() {
 	initRsaPrivateKey()
 	db, err := InitDB()
 	if err != nil {
-		println("数据库初始化失败: %s\n", err)
+		log.Fatalf("数据库初始化失败: %s\n", err)
 		return
 	}
 	startServer(db)
@@ -47,11 +47,11 @@ func startServer(db *gorm.DB) {
 	InitRoutes(context, db)
 	err := context.Run(":" + port)
 	if err != nil {
-		log.Printf("启动失败: %s\n", err)
+		log.Fatalf("启动失败: %s\n", err)
 	}
 }
 func InitDB() (*gorm.DB, error) {
-	db, err := gorm.Open(sqlite.Open("gorm.db"), &gorm.Config{})
+	db, err := gorm.Open(sqlite.Open("record.db"), &gorm.Config{})
 	if err != nil {
 		return nil, fmt.Errorf("数据库连接失败: %s\n", err)
 	}
